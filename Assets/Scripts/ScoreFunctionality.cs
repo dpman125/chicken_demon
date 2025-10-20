@@ -40,13 +40,34 @@ public class ScoreFunctionality : MonoBehaviour
         const int floatingPadmasana = 25;
     }
 
-    public int beans = 0;
+    // general stats
+    public int coins = 0;
     public int clickPower = 1;
-    public int hatCost = 50;
-    public int goggleCost = 100;
-    public int mrBeanCost = 1000;
-    public TextMeshProUGUI scoreText;
-    public string scorePrefix = "Score: ";
+    public int passiveCoins = 0;
+    public int strength = 0;
+    public int endurance = 0;
+    public int reflex = 0;
+    public int meditation = 0;
+
+    // costs
+    public int meditationCost = 50;
+    public int strengthCost = 100;
+    public int enduranceCost = 100;
+    public int reflexCost = 100;
+
+
+    // text
+    public TextMeshProUGUI coinText;
+    public TextMeshProUGUI medText;
+    public TextMeshProUGUI strText;
+    public TextMeshProUGUI endrText;
+    public TextMeshProUGUI rflxText;
+    public TextMeshProUGUI medCostText;
+    public TextMeshProUGUI strCostText;
+    public TextMeshProUGUI endrCostText;
+    public TextMeshProUGUI rflxCostText;
+    public float coinProgress = 0;
+
     public Animator playerAnim;
     public Animation kick;
     // Start is called before the first frame update
@@ -55,64 +76,104 @@ public class ScoreFunctionality : MonoBehaviour
         setText();
     }
 
-    public void increaseScore()
+    private void Update()
     {
-        beans = beans + clickPower;
+        coinProgress += passiveCoins * Time.deltaTime;
+
+        if (coinProgress >= 1f)
+        {
+            int coinsToAdd = Mathf.FloorToInt(coinProgress);
+            coins += coinsToAdd;
+            coinProgress -= coinsToAdd;
+            setText();
+        }
         setText();
+    }
+
+    public void increaseCoins()
+    {
+        coins += clickPower;
         playerAnim.Play("Kick");
-
     }
 
-    public void extraHat()
+    public void meditationUpgrade()
     {
-        if(beans >= hatCost)
+        if(coins >= meditationCost)
         {
             // clickpower increases only if funds are available
-            beans -= hatCost;
-            clickPower = clickPower + 1;
-            hatCost += (hatCost / 2);
+            coins -= meditationCost;
+            passiveCoins++;
+            meditation++;
+            meditationCost += (meditationCost / 4);
         }
-        setText();
         
     }
 
-    public void enhancedGoggles()
+    public void strengthUpgrade()
     {
-        if (beans >= goggleCost)
+        if (coins >= strengthCost)
         {
-            // clickpower increases only if funds are available
-            beans = beans - goggleCost;
-            clickPower = clickPower + 5;
-            goggleCost += (goggleCost / 2);
+            strength++;
+            coins -= strengthCost;
+            clickPower ++;
+            strengthCost += (strengthCost / 3);
         }
-        setText();
         
     }
-    public void mrBeans()
+    public void enduranceUpgrade()
     {
-        if (beans >= mrBeanCost)
+        if (coins >= enduranceCost)
         {
             // clickpower increases only if funds are available
-            beans = beans - mrBeanCost;
-            clickPower = clickPower * 2;
-            mrBeanCost += (mrBeanCost / 2);
+            coins -= enduranceCost;
+            endurance++;
+            enduranceCost += (enduranceCost / 3);
         }
-        setText();
 
       
+    }
+    public void reflexUpgrade()
+    {
+        if (coins >= reflexCost)
+        {
+            // clickpower increases only if funds are available
+            coins -= enduranceCost;
+            reflex++;
+            reflexCost += (reflexCost / 3);
+        }
+
+
     }
 
     void setText()
     {
-        scoreText.text = scorePrefix + ": " + beans;
+        coinText.text = coins.ToString();
+        medText.text = "zen: " + meditation;
+        strText.text = "strength: " + strength;
+        endrText.text = "endurance: " + endurance;
+        rflxText.text = "reflex: " + reflex;
+        medCostText.text = "$"+ meditationCost.ToString();
+        strCostText.text = "$" + strengthCost.ToString();
+        endrCostText.text = "$" + enduranceCost.ToString();
+        rflxCostText.text = "$" + reflexCost.ToString();
     }
+    public void restartGame()
+    {
+    coins = 0;
+    clickPower = 1;
+    passiveCoins = 0;
+    strength = 0;
+    endurance = 0;
+    reflex = 0;
+    meditation = 0;
+
+    // costs
+    meditationCost = 50;
+    strengthCost = 100;
+    enduranceCost = 100;
+    reflexCost = 100;
 }
 
-public class ResetDidClickOnExit : StateMachineBehaviour
-{
-    // Called when the animation state exits
-    override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    {
-        animator.SetBool("DidClick", false);
-    }
+
 }
+
